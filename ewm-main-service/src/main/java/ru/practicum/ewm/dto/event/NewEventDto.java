@@ -30,15 +30,17 @@ public class NewEventDto {
     @NotNull(message = "Location must not be null")
     private LocationDto location;
 
+    @Builder.Default
     private Boolean paid = false;
 
     @PositiveOrZero(message = "Participant limit must be positive or zero")
+    @Builder.Default
     private Integer participantLimit = 0;
 
+    @Builder.Default
     private Boolean requestModeration = true;
 
     @NotBlank(message = "Title must not be blank")
     @Size(min = 3, max = 120, message = "Title must be between 3 and 120 characters")
     private String title;
 }
-

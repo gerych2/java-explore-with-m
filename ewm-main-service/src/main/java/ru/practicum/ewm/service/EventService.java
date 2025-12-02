@@ -191,7 +191,7 @@ public class EventService {
                 onlyAvailable != null ? onlyAvailable : false, EventState.PUBLISHED, pageable);
 
         List<Event> eventList = new ArrayList<>(events.getContent());
-        
+
         // First save the hit, then get views
         saveHit(ip, uri);
         setViewsToEvents(eventList);
