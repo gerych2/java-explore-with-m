@@ -116,10 +116,14 @@ public class EventService {
                     .collect(Collectors.toList());
         }
 
+        // Convert empty lists to null for proper JPQL handling
+        List<Long> userIds = (users != null && !users.isEmpty()) ? users : null;
+        List<Long> categoryIds = (categories != null && !categories.isEmpty()) ? categories : null;
+
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, FORMATTER) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, FORMATTER) : null;
 
-        Page<Event> events = eventRepository.findEventsAdmin(users, eventStates, categories, start, end, pageable);
+        Page<Event> events = eventRepository.findEventsAdmin(userIds, eventStates, categoryIds, start, end, pageable);
 
         List<Event> eventList = events.getContent();
         setViewsToEvents(eventList);
@@ -180,6 +184,9 @@ public class EventService {
             start = LocalDateTime.now();
         }
 
+        // Convert empty list to null for proper JPQL handling
+        List<Long> categoryIds = (categories != null && !categories.isEmpty()) ? categories : null;
+
         Pageable pageable;
         if ("EVENT_DATE".equals(sort)) {
             pageable = PageRequest.of(from / size, size, Sort.by("eventDate"));
@@ -187,7 +194,7 @@ public class EventService {
             pageable = PageRequest.of(from / size, size);
         }
 
-        Page<Event> events = eventRepository.findEventsPublic(text, categories, paid, start, end,
+        Page<Event> events = eventRepository.findEventsPublic(text, categoryIds, paid, start, end,
                 onlyAvailable != null ? onlyAvailable : false, EventState.PUBLISHED, pageable);
 
         List<Event> eventList = new ArrayList<>(events.getContent());
@@ -287,8 +294,12 @@ public class EventService {
                     true
             );
 
-            Map<String, Long> viewsMap = stats.stream()
-                    .collect(Collectors.toMap(ViewStatsDto::getUri, ViewStatsDto::getHits));
+            Map<String, Long> viewsMap = new HashMap<>();
+            if (stats != null) {
+                for (ViewStatsDto stat : stats) {
+                    viewsMap.put(stat.getUri(), stat.getHits());
+                }
+            }
 
             for (Event event : events) {
                 String eventUri = "/events/" + event.getId();
