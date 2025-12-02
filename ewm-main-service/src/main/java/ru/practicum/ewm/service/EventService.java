@@ -188,16 +188,17 @@ public class EventService {
         }
 
         Page<Event> events = eventRepository.findEventsPublic(text, categories, paid, start, end,
-                onlyAvailable != null ? onlyAvailable : false, pageable);
+                onlyAvailable != null ? onlyAvailable : false, EventState.PUBLISHED, pageable);
 
         List<Event> eventList = new ArrayList<>(events.getContent());
+        
+        // First save the hit, then get views
+        saveHit(ip, uri);
         setViewsToEvents(eventList);
 
         if ("VIEWS".equals(sort)) {
             eventList.sort(Comparator.comparing(Event::getViews).reversed());
         }
-
-        saveHit(ip, uri);
 
         return eventList.stream()
                 .map(EventMapper::toShortDto)
@@ -208,8 +209,9 @@ public class EventService {
         Event event = eventRepository.findByIdAndState(id, EventState.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Event with id=" + id + " was not found"));
 
-        setViewsToEvents(List.of(event));
+        // First save the hit, then get views
         saveHit(ip, uri);
+        setViewsToEvents(List.of(event));
 
         return EventMapper.toFullDto(event);
     }
@@ -280,7 +282,7 @@ public class EventService {
         try {
             List<ViewStatsDto> stats = statsClient.getStats(
                     minDate.format(FORMATTER),
-                    LocalDateTime.now().format(FORMATTER),
+                    LocalDateTime.now().plusMinutes(1).format(FORMATTER),
                     uris,
                     true
             );
@@ -289,8 +291,8 @@ public class EventService {
                     .collect(Collectors.toMap(ViewStatsDto::getUri, ViewStatsDto::getHits));
 
             for (Event event : events) {
-                String uri = "/events/" + event.getId();
-                event.setViews(viewsMap.getOrDefault(uri, 0L));
+                String eventUri = "/events/" + event.getId();
+                event.setViews(viewsMap.getOrDefault(eventUri, 0L));
             }
         } catch (Exception e) {
             log.error("Failed to get views from stats service: {}", e.getMessage());
@@ -307,6 +309,7 @@ public class EventService {
                     .timestamp(LocalDateTime.now().format(FORMATTER))
                     .build();
             statsClient.saveHit(hit);
+            log.debug("Hit saved: uri={}, ip={}", uri, ip);
         } catch (Exception e) {
             log.error("Failed to save hit to stats service: {}", e.getMessage());
         }
@@ -319,4 +322,3 @@ public class EventService {
         eventRepository.save(event);
     }
 }
-
