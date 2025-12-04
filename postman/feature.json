@@ -13,32 +13,6 @@
 					"name": "Create Comment",
 					"event": [
 						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// Try to publish event if it's not published",
-									"var publishRequest = {",
-									"    url: pm.environment.get(\"baseUrl\") + \"/admin/events/\" + pm.environment.get(\"eventId\"),",
-									"    method: 'PATCH',",
-									"    header: {",
-									"        'Content-Type': 'application/json'",
-									"    },",
-									"    body: {",
-									"        mode: 'raw',",
-									"        raw: JSON.stringify({",
-									"            stateAction: 'PUBLISH_EVENT'",
-									"        })",
-									"    }",
-									"};",
-									"",
-									"pm.sendRequest(publishRequest, function (err, res) {",
-									"    // Ignore errors - event might already be published or not exist",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
 							"listen": "test",
 							"script": {
 								"exec": [
@@ -54,7 +28,7 @@
 									"    pm.expect(jsonData).to.have.property('author');",
 									"    ",
 									"    if (jsonData.id) {",
-									"        pm.environment.set(\"commentId\", jsonData.id);",
+									"        pm.collectionVariables.set(\"commentId\", jsonData.id);",
 									"    }",
 									"});"
 								],
@@ -369,35 +343,8 @@
 					"response": []
 				},
 				{
-					"name": "Create Comment - Unpublished Event",
+					"name": "Create Comment - Canceled Event",
 					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// Ensure event 2 exists and is in PENDING state (not published)",
-									"// First, try to reject it to make sure it's not published",
-									"var rejectRequest = {",
-									"    url: pm.environment.get(\"baseUrl\") + \"/admin/events/\" + pm.environment.get(\"unpublishedEventId\"),",
-									"    method: 'PATCH',",
-									"    header: {",
-									"        'Content-Type': 'application/json'",
-									"    },",
-									"    body: {",
-									"        mode: 'raw',",
-									"        raw: JSON.stringify({",
-									"            stateAction: 'REJECT_EVENT'",
-									"        })",
-									"    }",
-									"};",
-									"",
-									"pm.sendRequest(rejectRequest, function (err, res) {",
-									"    // Ignore errors - event might not exist or already be in correct state",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						},
 						{
 							"listen": "test",
 							"script": {
@@ -420,10 +367,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"text\": \"Comment on unpublished event\"\n}"
+							"raw": "{\n    \"text\": \"Comment on canceled event\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{unpublishedEventId}}",
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{canceledEventId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -432,10 +379,10 @@
 								"{{userId}}",
 								"comments",
 								"events",
-								"{{unpublishedEventId}}"
+								"{{canceledEventId}}"
 							]
 						},
-						"description": "Try to comment on unpublished event - should return 409"
+						"description": "Try to comment on canceled event - should return 409"
 					},
 					"response": []
 				},
@@ -546,7 +493,7 @@
 			"type": "string"
 		},
 		{
-			"key": "unpublishedEventId",
+			"key": "canceledEventId",
 			"value": "2",
 			"type": "string"
 		}
