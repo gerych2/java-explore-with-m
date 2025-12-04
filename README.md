@@ -61,4 +61,4 @@ docker-compose up --build
 
 ## Pull Request
 
-[Ссылка на Pull Request из ветки feature-comments в main](https://github.com/gerych2/java-explore-with-m/pull/XXX)
+[Ссылка на Pull Request из ветки feature-comments в main](https://github.com/gerych2/java-explore-with-m/pull/4)
