@@ -49,10 +49,21 @@ CREATE TABLE IF NOT EXISTS compilation_events (
     PRIMARY KEY (compilation_id, event_id)
 );
 
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGSERIAL PRIMARY KEY,
+    text VARCHAR(2000) NOT NULL,
+    event_id BIGINT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    author_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    edited TIMESTAMP WITHOUT TIME ZONE
+);
+
 CREATE INDEX IF NOT EXISTS idx_events_category_id ON events(category_id);
 CREATE INDEX IF NOT EXISTS idx_events_initiator_id ON events(initiator_id);
 CREATE INDEX IF NOT EXISTS idx_events_event_date ON events(event_date);
 CREATE INDEX IF NOT EXISTS idx_events_state ON events(state);
 CREATE INDEX IF NOT EXISTS idx_requests_event_id ON participation_requests(event_id);
 CREATE INDEX IF NOT EXISTS idx_requests_requester_id ON participation_requests(requester_id);
+CREATE INDEX IF NOT EXISTS idx_comments_event_id ON comments(event_id);
+CREATE INDEX IF NOT EXISTS idx_comments_author_id ON comments(author_id);
 

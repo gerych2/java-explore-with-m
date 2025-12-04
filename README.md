@@ -9,7 +9,7 @@
   - `stats-dto` — общие DTO (`EndpointHitDto`, `ViewStatsDto`);
   - `stats-server` — Spring Boot приложение для сбора/выдачи статистики;
   - `stats-client` — HTTP‑клиент (RestTemplate) для обращения к stats-server;
-- `ewm-main-service` — основной сервис (пока заглушка с Actuator + Web).
+- `ewm-main-service` — основной сервис приложения.
 
 ## Stats-service
 
@@ -17,26 +17,48 @@
 - GET `/stats` — получение статистики по интервалу, набору URI и flag `unique`;
 - PostgreSQL подключение через `application.properties` + `schema.sql`;
 - Dockerfile на `eclipse-temurin:21-jdk-alpine`;
-- docker-compose.yml поднимает: `stats-db`, `stats-server`, `main-db`, `ewm-main-service`.
+- docker-compose.yml поднимает: `stats-db`, `stats-server`, `main-db`, `ewm-service`.
 
-Запуск:
+## Main-service
+
+Основной сервис приложения "Explore With Me" с полной реализацией API:
+
+- **Admin API** — управление пользователями, категориями, событиями, подборками
+- **Public API** — публичный просмотр категорий, событий, подборок
+- **Private API** — управление своими событиями и заявками на участие
+
+### Дополнительная функциональность: Комментарии к событиям
+
+Реализована функциональность комментариев к событиям:
+
+- Пользователи могут оставлять комментарии к опубликованным событиям
+- Автор комментария может редактировать и удалять свои комментарии
+- Публичный просмотр комментариев к событиям
+- Получение всех комментариев пользователя
+
+#### API эндпоинты:
+
+**Private API:**
+- `POST /users/{userId}/comments/events/{eventId}` — создать комментарий
+- `PATCH /users/{userId}/comments/{commentId}` — обновить комментарий
+- `DELETE /users/{userId}/comments/{commentId}` — удалить комментарий
+- `GET /users/{userId}/comments` — получить все комментарии пользователя
+
+**Public API:**
+- `GET /events/{eventId}/comments` — получить комментарии к событию
+- `GET /events/{eventId}/comments/{commentId}` — получить комментарий по ID
+
+#### Postman коллекция
+
+Postman коллекция с тестами находится в файле `postman/comments.json`.
+
+## Запуск
+
 ```bash
 mvn clean install
 docker-compose up --build
 ```
 
-## Дополнительная функциональность (этап 1)
+## Pull Request
 
-Выбранная тема: **комментарии к событиям**.
-
-- Пользователь может оставлять комментарии к опубликованным событиям.
-- Автор комментария может редактировать/удалять его до публикации.
-- Инициатор события или администратор может модерировать (approve / reject).
-- Планируемые поля таблицы `comments`:
-  - `id`, `event_id`, `author_id`, `text`, `state`, `created`, `updated`.
-- API:
-  - публичное получение опубликованных комментариев по событию;
-  - приватные операции пользователя (создать, обновить, удалить/отменить);
-  - админ/инициатор — модерация и просмотр состояния.
-
-Реализация самой фичи запланирована на последующих этапах.
+[Ссылка на Pull Request из ветки feature-comments в main](https://github.com/gerych2/java-explore-with-m/pull/XXX)
