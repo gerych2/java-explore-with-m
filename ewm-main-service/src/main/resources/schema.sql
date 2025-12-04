@@ -56,3 +56,4 @@ CREATE INDEX IF NOT EXISTS idx_events_state ON events(state);
 CREATE INDEX IF NOT EXISTS idx_requests_event_id ON participation_requests(event_id);
 CREATE INDEX IF NOT EXISTS idx_requests_requester_id ON participation_requests(requester_id);
 
+

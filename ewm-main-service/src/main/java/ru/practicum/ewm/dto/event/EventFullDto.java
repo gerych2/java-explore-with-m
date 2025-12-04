@@ -29,3 +29,4 @@ public class EventFullDto {
     private Long views;
 }
 
+

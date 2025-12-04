@@ -11,3 +11,4 @@ public class LocationDto {
     private Float lon;
 }
 
+

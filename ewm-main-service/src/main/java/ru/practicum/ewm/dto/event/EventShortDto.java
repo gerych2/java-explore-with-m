@@ -20,3 +20,4 @@ public class EventShortDto {
     private Long views;
 }
 
+

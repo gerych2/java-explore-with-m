@@ -13,3 +13,4 @@ public class EventRequestStatusUpdateResult {
     private List<ParticipationRequestDto> rejectedRequests;
 }
 
+
