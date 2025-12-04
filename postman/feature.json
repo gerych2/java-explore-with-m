@@ -115,6 +115,48 @@
 					"response": []
 				},
 				{
+					"name": "Get Comment by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has comment data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('text');",
+									"    pm.expect(jsonData).to.have.property('eventId');",
+									"    pm.expect(jsonData).to.have.property('author');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Get a specific comment by ID"
+					},
+					"response": []
+				},
+				{
 					"name": "Get User Comments",
 					"event": [
 						{
@@ -250,48 +292,6 @@
 						"description": "Get all comments for an event"
 					},
 					"response": []
-				},
-				{
-					"name": "Get Comment by ID",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Response has comment data\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.have.property('id');",
-									"    pm.expect(jsonData).to.have.property('text');",
-									"    pm.expect(jsonData).to.have.property('eventId');",
-									"    pm.expect(jsonData).to.have.property('author');",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"events",
-								"{{eventId}}",
-								"comments",
-								"{{commentId}}"
-							]
-						},
-						"description": "Get a specific comment by ID"
-					},
-					"response": []
 				}
 			]
 		},
@@ -346,6 +346,16 @@
 					"name": "Create Comment - Unpublished Event",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// This test assumes eventId 2 exists and is not published",
+									"// If eventId 2 doesn't exist, create it first via admin API"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"exec": [
@@ -370,7 +380,7 @@
 							"raw": "{\n    \"text\": \"Comment on unpublished event\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{eventId}}",
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{unpublishedEventId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -379,7 +389,7 @@
 								"{{userId}}",
 								"comments",
 								"events",
-								"{{eventId}}"
+								"{{unpublishedEventId}}"
 							]
 						},
 						"description": "Try to comment on unpublished event - should return 409"
@@ -489,6 +499,11 @@
 		},
 		{
 			"key": "otherUserId",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "unpublishedEventId",
 			"value": "2",
 			"type": "string"
 		}

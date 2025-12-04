@@ -38,8 +38,8 @@ public class CommentService {
         User author = userService.getUserById(userId);
         Event event = eventService.getEventById(eventId);
 
-        if (event.getState() == EventState.CANCELED) {
-            throw new ConflictException("Cannot comment on canceled event");
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new ConflictException("Cannot comment on unpublished event");
         }
 
         Comment comment = CommentMapper.toEntity(dto, event, author);
