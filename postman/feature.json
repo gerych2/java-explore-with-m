@@ -13,6 +13,32 @@
 					"name": "Create Comment",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Try to publish event if it's not published",
+									"var publishRequest = {",
+									"    url: pm.environment.get(\"baseUrl\") + \"/admin/events/\" + pm.environment.get(\"eventId\"),",
+									"    method: 'PATCH',",
+									"    header: {",
+									"        'Content-Type': 'application/json'",
+									"    },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            stateAction: 'PUBLISH_EVENT'",
+									"        })",
+									"    }",
+									"};",
+									"",
+									"pm.sendRequest(publishRequest, function (err, res) {",
+									"    // Ignore errors - event might already be published or not exist",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"exec": [
@@ -349,8 +375,25 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"// This test assumes eventId 2 exists and is not published",
-									"// If eventId 2 doesn't exist, create it first via admin API"
+									"// Ensure event 2 exists and is in PENDING state (not published)",
+									"// First, try to reject it to make sure it's not published",
+									"var rejectRequest = {",
+									"    url: pm.environment.get(\"baseUrl\") + \"/admin/events/\" + pm.environment.get(\"unpublishedEventId\"),",
+									"    method: 'PATCH',",
+									"    header: {",
+									"        'Content-Type': 'application/json'",
+									"    },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            stateAction: 'REJECT_EVENT'",
+									"        })",
+									"    }",
+									"};",
+									"",
+									"pm.sendRequest(rejectRequest, function (err, res) {",
+									"    // Ignore errors - event might not exist or already be in correct state",
+									"});"
 								],
 								"type": "text/javascript"
 							}
