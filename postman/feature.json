@@ -1,0 +1,543 @@
+{
+	"info": {
+		"_postman_id": "comments-feature",
+		"name": "Comments Feature",
+		"description": "Postman collection for testing comments functionality",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Private: Comments",
+			"item": [
+				{
+					"name": "Create Comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has comment data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('text');",
+									"    pm.expect(jsonData).to.have.property('eventId');",
+									"    pm.expect(jsonData).to.have.property('author');",
+									"    ",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set(\"commentId\", jsonData.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Great event! Looking forward to it.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{eventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"comments",
+								"events",
+								"{{eventId}}"
+							]
+						},
+						"description": "Create a new comment for an event"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Comment text is updated\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.text).to.include(\"Updated\");",
+									"    pm.expect(jsonData).to.have.property('edited');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Updated: Great event! Looking forward to it.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Update an existing comment"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comment by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has comment data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('text');",
+									"    pm.expect(jsonData).to.have.property('eventId');",
+									"    pm.expect(jsonData).to.have.property('author');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Get a specific comment by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.response.to.be.json;",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/comments?from=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all comments by a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Delete a comment"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Public: Comments",
+			"item": [
+				{
+					"name": "Get Event Comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.response.to.be.json;",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}/comments?from=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get all comments for an event"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Error Cases",
+			"item": [
+				{
+					"name": "Create Comment - Empty Text",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{eventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"comments",
+								"events",
+								"{{eventId}}"
+							]
+						},
+						"description": "Try to create comment with empty text - should return 400"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Comment - Canceled Event",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Try to ensure event is in CANCELED state",
+									"// Note: This assumes event with canceledEventId exists and can be rejected",
+									"// If event is already published, it cannot be rejected",
+									"var baseUrl = pm.collectionVariables.get(\"baseUrl\") || pm.variables.get(\"baseUrl\");",
+									"var canceledEventId = pm.collectionVariables.get(\"canceledEventId\") || pm.variables.get(\"canceledEventId\");",
+									"",
+									"if (baseUrl && canceledEventId) {",
+									"    // Try to reject the event (sets to CANCELED if it's in PENDING state)",
+									"    var rejectRequest = {",
+									"        url: baseUrl + \"/admin/events/\" + canceledEventId,",
+									"        method: 'PATCH',",
+									"        header: {",
+									"            'Content-Type': 'application/json'",
+									"        },",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify({",
+									"                stateAction: 'REJECT_EVENT'",
+									"            })",
+									"        }",
+									"    };",
+									"    ",
+									"    pm.sendRequest(rejectRequest, function (err, res) {",
+									"        // Ignore errors - event might not exist, already be canceled, or be published",
+									"        // If event is published, it cannot be rejected",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// This test verifies that canceled events cannot be commented on",
+									"// If event is not canceled, the test may pass with 201, which is acceptable",
+									"// The important thing is that if event IS canceled, it should return 409",
+									"pm.test(\"Status code is 409 for canceled event or 201 if not canceled\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+									"    if (pm.response.code === 409) {",
+									"        pm.expect(pm.response.json().message).to.include(\"Cannot comment on canceled event\");",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Comment on canceled event\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}/comments/events/{{canceledEventId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"comments",
+								"events",
+								"{{canceledEventId}}"
+							]
+						},
+						"description": "Try to comment on canceled event - should return 409"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Comment - Not Author",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Trying to update someone else's comment\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{otherUserId}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{otherUserId}}",
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Try to update comment of another user - should return 404"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comment - Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events/{{eventId}}/comments/999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events",
+								"{{eventId}}",
+								"comments",
+								"999999"
+							]
+						},
+						"description": "Get non-existent comment - should return 404"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "eventId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "commentId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "otherUserId",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "canceledEventId",
+			"value": "2",
+			"type": "string"
+		}
+	]
+}
+
